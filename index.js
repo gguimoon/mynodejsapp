@@ -3,6 +3,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var mysql = require("mysql");
+var hasher = require("pbkdf2-password")();
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -16,6 +17,34 @@ var con = mysql.createConnection({
 
 var task = [];
 var complete = [];
+
+var users = {
+    tommy: { name: "Tommy" },
+    alice: { name: "Alice" }
+};
+
+hasher({ password: "qwer1234" }, (err, pass, salt, hash) => {
+    if (err) throw err;
+    users.tommy.salt = salt;
+    users.tommy.hash = hash;
+});
+
+hasher({ password: "asdf1234" }, (err, pass, salt, hash) => {
+    if (err) throw err;
+    users.alice.salt = salt;
+    users.alice.hash = hash;
+});
+
+function authenticate(name, pass, fn) {
+    var user = users[name];
+    // console.log(user);
+    if (!user) return fn(null, null);
+    hasher({ password: pass, salt: user.salt }, (err, pass, salt, hash) => {
+        if (err) return fn(err);
+        if (hash == user.hash) return fn(null, user);
+        fn(null, null);
+    });
+}
 
 con.connect((err) => {
     if (err) throw err;
@@ -61,6 +90,35 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
+    res.redirect("/login");
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.post("/login", (req, res) => {
+    console.log(`Authenticating ${req.body.username}:${req.body.password}`);
+    authenticate(req.body.username, req.body.password, (err, user) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        if (user) {
+            console.log(`Authenticated as ${user.name}`);
+            res.redirect("/index");
+        } else {
+            console.log(`Authentication failed`);
+            res.redirect("/error");
+        }
+    });
+});
+
+app.get("/error", (req, res) => {
+    res.render("error");
+});
+
+app.get("/index", (req, res) => {
     res.render("index", { task: task, complete: complete });
 });
 
@@ -68,7 +126,7 @@ app.post("/addtask", (req, res) => {
     var newTask = req.body.newtask;
     task.push(newTask);
     addNewTask(newTask);
-    res.redirect("/");
+    res.redirect("/index");
 });
 
 app.post("/removetask", (req, res) => {
@@ -84,7 +142,7 @@ app.post("/removetask", (req, res) => {
             task.splice(task.indexOf(completeTask[i]), 1);
         }
     }
-    res.redirect("/");
+    res.redirect("/index");
 });
 
 app.post("/revoketask", (req, res) => {
@@ -100,7 +158,7 @@ app.post("/revoketask", (req, res) => {
             complete.splice(complete.indexOf(revokeTask[i]), 1);
         }
     }
-    res.redirect("/");
+    res.redirect("/index");
 });
 
 app.post("/deltask", (req, res) => {
@@ -114,7 +172,7 @@ app.post("/deltask", (req, res) => {
             complete.splice(complete.indexOf(delTask[i]), 1);
         }
     }
-    res.redirect("/");
+    res.redirect("/index");
 });
 
 app.listen(port, () => {
