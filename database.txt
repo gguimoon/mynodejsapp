@@ -1,0 +1,45 @@
+[ec2-user@ip-172-31-40-99 ~]$ mysql -u tutorial_user -p -h tutorial-db-instance.cmh7xi9uudoy.ap-northeast-2.rds.amazonaws.com mytodo
+Enter password:
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2877
+Server version: 8.0.28 Source distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [mytodo]> show tables;
++------------------+
+| Tables_in_mytodo |
++------------------+
+| ToDo             |
++------------------+
+1 row in set (0.001 sec)
+
+MySQL [mytodo]> describe ToDo;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| title    | varchar(255) | YES  |     | NULL    |       |
+| complete | varchar(5)   | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+2 rows in set (0.013 sec)
+
+MySQL [mytodo]> SELECT * FROM ToDo;
++-------------------------------+----------+
+| title                         | complete |
++-------------------------------+----------+
+| 세탁물 찾기                   | Yes      |
+| 쓰레기 버리기                 | No       |
+| 강아지 먹이주기               | Yes      |
+| 중고책 처분하기               | Yes      |
+| 도서관 대출 반납하기          | No       |
++-------------------------------+----------+
+5 rows in set (0.001 sec)
+
+MySQL [mytodo]> exit
+Bye
+[ec2-user@ip-172-31-40-99 ~]$
