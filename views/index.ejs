@@ -6,7 +6,7 @@
   </head>
   <body>
     <div class="container">
-      <h2>A Simple ToDo List App</h2>
+      <h2>Welcome <%= user %>, Your ToDo List</h2>
       <form action="/addtask" method="POST">
         <input type="text" name="newtask" placeholder="Your new task" />
         <button>Add</button>
@@ -14,7 +14,7 @@
         <% for (var i = 0; i < task.length; i++) { %>
           <li><input type="checkbox" name="check" value="<%= task[i] %>" /><%= task[i] %></li>
         <% } %>
-        <button formaction="/removetask" type="submit">Remove</button>
+        <button formaction="/removetask" type="submit">Complete</button>
         <h2>Completed Task</h2>
         <% for (var i = 0; i < complete.length; i++) { %>
           <li><input type="checkbox" name="choose" value="<%= complete[i] %>" /><%= complete[i] %></li>

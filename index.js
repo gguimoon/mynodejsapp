@@ -17,6 +17,7 @@ var con = mysql.createConnection({
 
 var task = [];
 var complete = [];
+var loginUser = "";
 
 var users = {
     tommy: { name: "Tommy" },
@@ -98,7 +99,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    console.log(`Authenticating ${req.body.username}:${req.body.password}`);
+    // console.log(`Authenticating ${req.body.username}:${req.body.password}`);
     authenticate(req.body.username, req.body.password, (err, user) => {
         if (err) {
             console.log(err);
@@ -106,6 +107,7 @@ app.post("/login", (req, res) => {
         }
         if (user) {
             console.log(`Authenticated as ${user.name}`);
+            loginUser = user.name;
             res.redirect("/index");
         } else {
             console.log(`Authentication failed`);
@@ -119,7 +121,7 @@ app.get("/error", (req, res) => {
 });
 
 app.get("/index", (req, res) => {
-    res.render("index", { task: task, complete: complete });
+    res.render("index", { task: task, complete: complete, user: loginUser });
 });
 
 app.post("/addtask", (req, res) => {
