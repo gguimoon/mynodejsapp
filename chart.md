@@ -6,9 +6,9 @@ title: CRS Flowchart
 ---
 graph TD
     %% DBs
-    TaskDB[(Task DB)]
+    TaskDB[(Code DB)]
     Corpus[(Corpus)]
-    Products[(Products)]
+    Products[(Results)]
 
     %% Data types
     Task((Task))
@@ -19,19 +19,18 @@ graph TD
 
 
     %% Processes
-    Build[build]
-    Fuzz[fuzz]
-    Type{check type}
-    Infer[analyze repo w/ Infer]
-    AInalyze[analyze repo w/ LLMs]
-    Diff[analyze diff w/ agent]
-    Score{score vuln report}
-    VulnAnalyze[analyze report w/ agent]
-    POVProduce[produce pov]
-    GenPatch[patch vuln]
-    LLMTriage[triage crash w/ agent]
+    Build[Build]
+    Fuzz[Fuzz]
+    Type{Choose method}
+    Infer[Analyze repo w/ Infer]
+    AInalyze[Analyze repo w/ LLMs]
+    Score{Score vuln report}
+    VulnAnalyze[Analyze report w/ agent]
+    POVProduce[Produce POV]
+    GenPatch[Patch vuln]
+    LLMTriage[Triage crash w/ agent]
 
-    DedupeVuln[dedupe vulns with LLM]
+    DedupeVuln[Dedupe vulns with LLM]
 
     %% Edges
     TaskDB -.-> Task
@@ -40,8 +39,8 @@ graph TD
     Fuzz -- minset --> Corpus
     Fuzz -. crash .-> LLMTriage
 
-    Task --> Type -- Full --> Infer -.-> VulnReport
-             Type -- Full --> AInalyze -.-> VulnReport
+    Task --> Type -- static --> Infer -.-> VulnReport
+             Type -- LLM --> AInalyze -.-> VulnReport
 
     Artifacts --> Fuzz
     Artifacts --> Infer
@@ -52,7 +51,7 @@ graph TD
 
     DedupeVuln --> POVProduce -- attempt --> Corpus
                    POVProduce -. crash .-> LLMTriage
-    DedupeVuln -- Vuln --> Products
+    DedupeVuln -- vuln --> Products
     DedupeVuln --> GenPatch -.-> Patch
 
     LLMTriage -.-> AnalyzedVuln
@@ -60,6 +59,6 @@ graph TD
 
     Corpus --> Fuzz
 
-    Patch -- Patch --> Products
+    Patch -- patch --> Products
     LLMTriage -- POV --> Products
 ```
